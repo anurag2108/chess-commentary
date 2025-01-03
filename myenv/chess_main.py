@@ -26,8 +26,6 @@ def drawGameState(screen,gs):
     drawBoard(screen)
     drawPieces(screen, gs.board)
 
-
-
 #Draw the squares on the board.
 def drawBoard(screen):
     colors = [p.Color("white"),p.Color("black")]
@@ -62,12 +60,33 @@ def main():
 
     loadImages()
     running = True
-    
+    sqSelected = () #keep track of clicks of the user.
+    playerClicks = [] #
 
     while running:
         for e in p.event.get():
             if e.type == p.QUIT:
                 running = False
+            elif e.type == p.HOUSEBUTTONDOWN:
+                location = p.mouse.get_pos()
+                col = location[0]//SQ_SIZE
+                row = location[1]//SQ_SIZE
+
+                if sqSelected == (row,col):
+                    sqSelected = () #unselect
+                    playerClicks = []
+                else:
+                    sqSelected = (row,col)
+                    playerClicks.append(sqSelected)
+
+                #Was the second click by the user?
+                if(len(playerClicks)==2):
+                    move = ChessEngine.Move(playerClicks[0], playerClicks[1], gs.board) 
+                    print(move.getChessNotation())
+                    gs.makeMove(move)
+                    sqSelected = ()
+                    playerClicks = []
+
         drawGameState(screen,gs)
         clock.tick(MAX_FPS)
         p.display.flip()
