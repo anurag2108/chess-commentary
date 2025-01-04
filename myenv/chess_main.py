@@ -3,11 +3,11 @@ Responsible for user-input and showing the current game state.
 '''
 
 import pygame as p
-from chess import ChessEngine
+import chess_engine
 
 WIDTH = HEIGHT = 512
 DIMENSION = 8
-SQ_SIZE = HEIGHT/DIMENSION
+SQ_SIZE = HEIGHT//DIMENSION
 MAX_FPS = 15
 Images = {}
 
@@ -18,7 +18,7 @@ Initialize a dictionary of Images, called once.
 def loadImages():
     pieces = ['wp','wR','wN','wB','wQ','wK','bp','bR','bN','bB','bQ','bK']
     for piece in pieces:
-        Images[piece] = p.transform.scale(p.image.load("images/"+piece+".png"),(SQ_SIZE,SQ_SIZE))
+        Images[piece] = p.transform.scale(p.image.load("myenv/images/"+piece+".png"),(SQ_SIZE,SQ_SIZE))
 
 
 #All Graphics
@@ -28,7 +28,7 @@ def drawGameState(screen,gs):
 
 #Draw the squares on the board.
 def drawBoard(screen):
-    colors = [p.Color("white"),p.Color("black")]
+    colors = [p.Color("white"),p.Color("grey")]
 
     for r in range(DIMENSION):
         for c in range(DIMENSION):
@@ -56,18 +56,21 @@ def main():
     screen = p.display.set_mode((WIDTH,HEIGHT))
     clock = p.time.Clock()
     screen.fill(p.Color("white"))
-    gs = ChessEngine.GameState()
+    gs = chess_engine.GameState()
 
     loadImages()
     running = True
     sqSelected = () #keep track of clicks of the user.
     playerClicks = [] #
 
+    validMoves = gs.getValidMoves()
+    moveMade = False
+
     while running:
         for e in p.event.get():
             if e.type == p.QUIT:
                 running = False
-            elif e.type == p.HOUSEBUTTONDOWN:
+            elif e.type == p.MOUSEBUTTONDOWN:
                 location = p.mouse.get_pos()
                 col = location[0]//SQ_SIZE
                 row = location[1]//SQ_SIZE
@@ -81,11 +84,21 @@ def main():
 
                 #Was the second click by the user?
                 if(len(playerClicks)==2):
-                    move = ChessEngine.Move(playerClicks[0], playerClicks[1], gs.board) 
+                    move = chess_engine.Move(playerClicks[0], playerClicks[1], gs.board) 
                     print(move.getChessNotation())
-                    gs.makeMove(move)
+                    if(move in validMoves):
+                        gs.makeMove(move)
+                        moveMade=True
                     sqSelected = ()
                     playerClicks = []
+            elif e.type == p.KEYDOWN:
+                if e.key == p.K_z:
+                    gs.undoMove()
+                    moveMade=True
+
+        if moveMade:
+            validMoves = gs.getValidMoves()
+            moveMade = False
 
         drawGameState(screen,gs)
         clock.tick(MAX_FPS)
