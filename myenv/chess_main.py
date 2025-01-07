@@ -66,6 +66,8 @@ def main():
     validMoves = gs.getValidMoves()
     moveMade = False
 
+    movesMade = []
+
     while running:
         for e in p.event.get():
             if e.type == p.QUIT:
@@ -85,7 +87,11 @@ def main():
                 #Was the second click by the user?
                 if(len(playerClicks)==2):
                     move = chess_engine.Move(playerClicks[0], playerClicks[1], gs.board) 
-                    print(move.getChessNotation())
+                    moveMade = move.getChessNotation()
+                    #Adjust the board with the moveMade to stockfish.
+                    #Ask stockfish to suggest moves.
+                    #Pass those moves to LLM for commentary.
+                    movesMade.append(moveMade)
                     if(move in validMoves):
                         gs.makeMove(move)
                         moveMade=True

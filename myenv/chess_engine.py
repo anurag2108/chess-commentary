@@ -529,5 +529,26 @@ class Move():
     
     def getChessNotation(self):
         #Can Create real chess notation from here.
-        return self.getRankFile(self.startRow,self.startCol) + self.getRankFile(self.endRow,self.endCol)
+        #return self.getRankFile(self.startRow,self.startCol) + self.getRankFile(self.endRow,self.endCol)
+        """Create the chess notation for the move."""
+
+        #print(self.pieceMoved,self.startCol,self.endCol)
+
+        if self.pieceMoved.upper()[1] == "K" and abs(self.startCol - self.endCol) == 2:
+            if self.endCol > self.startCol:  # Kingside castling
+                return "O-O"
+            else:  # Queenside castling
+                return "O-O-O"
+
+        moveString = ""
+        if self.pieceMoved.upper() != "P":  # Non-pawn pieces
+            moveString += self.pieceMoved.upper()
+        if self.pieceCaptured != "--":  # Capture move
+            if self.pieceMoved.upper() == "P":  # Pawn capture notation
+                moveString += self.getRankFile(self.startRow, self.startCol)[0]
+            moveString += "x"
+        moveString += self.getRankFile(self.endRow, self.endCol)
+
+        # Add check/checkmate notation (optional for further refinement)
+        return moveString
 
