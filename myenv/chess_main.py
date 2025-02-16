@@ -126,7 +126,7 @@ def get_deepseek_commentary(prompt):
     Use Ollama to chat with the DeepSeek model for commentary.
     """
     response = ollama.chat(
-        model="deepseek-r1",
+        model="deepseek-r1:1.5b",
         messages=[
             {"role": "user", "content": prompt}
         ],
